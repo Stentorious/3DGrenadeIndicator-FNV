@@ -1,0 +1,241 @@
+<rect name="3DGrenade">
+
+	<visible> <copy src="HitPoints" trait="visible"/> </visible>
+	<font> 0 </font> 
+	
+	<_ShowTimer> 1 </_ShowTimer>
+	<_RadiusMax> 0 </_RadiusMax>
+	<_AlphaPulse> 0 </_AlphaPulse>
+	<_Height> <copy> 36 </copy> <mul src="me()" trait="_Scale"/> </_Height>
+	<_Width> <copy> 36 </copy> <mul src="me()" trait="_Scale"/> </_Width>
+	<_FontBase> 0 </_FontBase>
+	<_ResizeMultiplier> 1 </_ResizeMultiplier>
+	
+	<_Font> 
+		<copy> 
+			<copy> 3 </copy>
+			<onlyifnot src="io()" trait="_DUIF3"/>
+			<add>
+				<copy> 4 </copy>			
+				<onlyif src="io()" trait="_DUIF3"/>
+			</add>
+		</copy>
+		<onlyifnot src="me()" trait="_FontBase"/>
+		<onlyifnot src="me()" trait="font"/>
+		<add src="me()" trait="_FontBase"/>			
+		<add src="me()" trait="font"/>
+	</_Font>
+
+	<_FontYBase> 0 </_FontYBase>
+	<_FontY>
+		<copy> 0 </copy>
+		<add>
+			<copy src="me()" trait="_Font"/>
+			<copy src="globals" trait="_VUI+FontY_"/>
+			<onlyif src="globals" trait="_VUI+"/>
+		</add>
+		<add>
+			<copy src="me()" trait="_Font"/>
+			<copy src="io()" trait="_DarNFontY_"/>
+			<onlyif src="io()" trait="_DUIF3"/>
+		</add>
+		<add>
+			<copy src="JWH" trait="_JWHFont"/>
+			<copy src="io()" trait="_VNLAFontY_"/>
+			<onlyifnot>
+				<copy src="io()" trait="_DUIF3"/>
+				<or src="globals" trait="_VUI+"/>
+			</onlyifnot>
+		</add>
+		<onlyifnot src="me()" trait="_FontYBase"/>
+		<add src="me()" trait="_FontYBase"/>
+	</_FontY>
+
+	<_Scale>
+		<copy> 1 </copy>
+		<mul>
+			<copy src="io()" trait="_duiscale_65"/>
+			<onlyif src="io()" trait="_DUIF3"/>
+			<add>
+				<copy> 1 </copy>
+				<onlyifnot src="io()" trait="_DUIF3"/>
+			</add>
+		</mul>
+		<mul src="me()" trait="_ResizeMultiplier"/>
+	</_Scale>
+
+</rect>
+
+<template name="3DGRect">
+	<rect name="3DGrenade">
+	</rect>
+</template>
+
+<template name="3DGIcon">
+	<rect name="3DGTemp"> 
+
+		<visible> 
+			<copy> 0 </copy>
+			<add>
+				<copy> 1 </copy>
+				<onlyif> <copy src="me()" trait="_Radius"/> <lte> <copy src="3DGrenade" trait="_RadiusMax"/> </lte> </onlyif>
+			</add>
+		</visible>
+		
+		<locus> &true; </locus>
+		
+		<x>
+			<copy src="me()" trait="_X"/>
+			<min> 
+				<copy> 1 </copy>
+				<sub src="me()" trait="_OffsetWidth"/>
+			</min>
+			<max src="me()" trait="_OffsetWidth"/>
+			<sub>
+				<copy> 10 </copy>
+				<onlyif>
+					<copy src="me()" trait="_X"/>
+					<lte> -1 </lte>
+				</onlyif>
+			</sub>
+			<mul src="screen()" trait="width"/>
+		</x>
+		
+		<y>
+			<copy src="me()" trait="_Y"/>
+			<min> 
+				<copy> 1 </copy>
+				<sub src="me()" trait="_OffsetHeight"/>
+			</min>
+			<max src="me()" trait="_OffsetHeight"/>
+			<sub>
+				<copy> 10 </copy>
+				<onlyif>
+					<copy src="me()" trait="_Y"/>					
+					<lte> -1 </lte>
+				</onlyif>
+			</sub>
+			<mul src="screen()" trait="height"/>
+			<sub> 7.5 </sub>
+		</y>
+		
+		<alpha>
+			<copy> 255 </copy>
+			<sub>
+				<copy>
+					<copy>255</copy>
+					<sub>
+						<copy src="3DGrenade" trait="_RadiusMax"/>
+						<sub src="me()" trait="_Radius"/>
+						<div>
+							<copy src="3DGrenade" trait="_RadiusMax"/>
+							<sub src="me()" trait="_RadiusDMG"/>
+						</div>
+						<mul> 255 </mul>
+					</sub>
+				</copy>
+				<onlyifnot> <copy src="me()" trait="_Radius"/> <lte> <copy src="me()" trait="_RadiusDMG"/> </lte> </onlyifnot>
+			</sub>
+		</alpha>
+
+		<_Font> <copy src="3DGrenade" trait="_Font"/> </_Font>
+		<_Width> <copy src="3DGrenade" trait="_Width"/> </_Width>
+		<_Height> <copy src="3DGrenade" trait="_Height"/> </_Height>
+		<_FontY> <copy src="3DGrenade" trait="_FontY"/> </_FontY>
+		<_OffsetWidth> 0.02 </_OffsetWidth>
+		<_OffsetHeight> 0.01 </_OffsetHeight>
+		<_ShowTimer> <copy src="3DGrenade" trait="_ShowTimer"/> </_ShowTimer>
+		<_Timer> 0 </_Timer>
+		<_X> -1 </_X>
+		<_Y> -1 </_Y>
+		<_Radius>0</_Radius>
+		<_RadiusDMG>0</_RadiusDMG>
+		<_IconColor> &hudmain; </_IconColor>
+		
+		<image name="Icon">
+			<filename> Stentorious\Interface\3DGrenade.dds </filename>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<y> <copy src="me()" trait="height"/> <div> -1 </div> </y>
+			<depth> -11 </depth>
+			<width> <copy src="parent()" trait="_Width"/> </width>
+			<height> <copy src="parent()" trait="_Height"/> </height>
+			<zoom> &scale; </zoom>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>			
+			
+			<brightness> 
+				<copy> 255 </copy> 
+				<mul> 
+					<copy> 1 </copy>
+					<sub>
+						<copy src="3DGrenade" trait="_AlphaPulse"/>
+						<onlyif> <copy src="me()" trait="systemcolor"/> <eq> &hudalt; </eq> </onlyif>
+					</sub>
+				</mul>
+			</brightness>
+			
+			<systemcolor> 
+				<copy> 0 </copy>
+				<add>
+					<copy> <copy src="parent()" trait="_IconColor"/> </copy>
+					<onlyifnot> <copy src="parent()" trait="_Radius"/> <lte> <copy src="parent()" trait="_RadiusDMG"/> </lte> </onlyifnot>
+				</add>
+				<add>
+					<copy> &hudalt; </copy>
+					<onlyif> <copy src="parent()" trait="_Radius"/> <lte> <copy src="parent()" trait="_RadiusDMG"/> </lte> </onlyif>
+				</add>
+			</systemcolor>
+			
+		</image>
+		
+		<text name="Timer">
+			<visible> <copy src="parent()" trait="_ShowTimer"/> </visible>
+			<depth> -10 </depth>
+			<string> <copy src="parent()" trait="_Timer"/> </string>
+			<font> <copy src="parent()" trait="_Font"/> </font>
+			<justify> &center; </justify>
+			<clips> <copy src="parent()" trait="clips"/> </clips>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			
+			<x>
+				<copy> 0 </copy>
+				<add>
+					<copy src="me()" trait="width"/>
+					<div> 2 </div>
+					<sub src="parent()" trait="x"/>
+					<max> 0 </max>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 2 </div>
+					<sub src="screen()" trait="width"/>
+					<add src="parent()" trait="x"/>
+					<max> 0 </max>				
+				</sub>
+			</x>
+			
+			<y>
+				<copy> 0 </copy>
+				<sub>
+					<copy src="me()" trait="height"/>
+					<onlyif src="me()" trait="visible"/>
+				</sub>
+				<sub src="sibling(Icon)" trait="height"/>
+				<add src="parent()" trait="_FontY"/>
+			</y>
+			
+			<systemcolor> 
+				<copy> 0 </copy>
+				<add>
+					<copy> &hudmain; </copy>
+					<onlyifnot> <copy src="parent()" trait="_Radius"/> <lte> <copy src="parent()" trait="_RadiusDMG"/> </lte> </onlyifnot>
+				</add>
+				<add>
+					<copy> &hudalt; </copy>
+					<onlyif> <copy src="parent()" trait="_Radius"/> <lte> <copy src="parent()" trait="_RadiusDMG"/> </lte> </onlyif>
+				</add>
+			</systemcolor>
+			
+		</text>
+		
+	</rect>
+</template>

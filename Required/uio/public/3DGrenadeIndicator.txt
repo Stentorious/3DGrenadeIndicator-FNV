@@ -1,0 +1,2 @@
+Stentorious\3DGrenadeIndicator.xml::HUDMainMenu
+true
