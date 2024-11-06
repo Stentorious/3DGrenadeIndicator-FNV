@@ -1,6 +1,6 @@
-float fX
-float fY
-float fZ
+float fPosX
+float fPosY
+float fPosZ
 ref rGrenade
 array_var aGrenades
 array_var aForE
@@ -19,9 +19,9 @@ begin Function {}
 
 				; Update icon
 				sUIPath = "HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $aForE["key"]
-				WorldToScreen (fX) (fY) (fZ) (0) (0) (0) (1) (rGrenade)
-				SetUIFloatAlt (sUIPath + "\_X") fX
-				SetUIFloatAlt (sUIPath + "\_Y") fY
+				WorldToScreen (fPosX) (fPosY) (fPosZ) (0) (0) (0) (1) (rGrenade)
+				SetUIFloatAlt (sUIPath + "\_x") fPosX
+				SetUIFloatAlt (sUIPath + "\_y") fPosY
 				SetUIFloatAlt (sUIPath + "\_Radius") (Player.GetDistance3D rGrenade)
 				SetUIStringAlt (sUIPath + "\_Timer") "%.2f" (GetMaxOf 0 (rGrenade.GetDetonationTimer))
 
