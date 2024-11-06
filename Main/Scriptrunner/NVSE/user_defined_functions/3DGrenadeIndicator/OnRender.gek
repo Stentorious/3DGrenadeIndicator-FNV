@@ -1,29 +1,35 @@
 float fX
 float fY
 float fZ
-ref stR1
-string_var stS1
-array_var stA1
+ref rGrenade
+array_var aGrenades
 array_var aForE
+string_var sUIPath
 
 begin Function {}
 
-	stA1 = Goo1.AuxVarGetAsArr "*3DGrenadeRef"																	; Get tracked refs
-	if eval stA1 != Ar_Null																						; If any tracked refs
-		foreach aForE <- stA1																					; Loop through tracked refs
-			stR1 = *aForE
-			if eval (IsFormValid stR1 && IsReference stR1 && GetWeaponType (stR1.GetProjectileRefWeapon) == 10)	; If ref valid grenade projectile
-				stS1 = "HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $aForE["key"]									; Init UI tile string_var
-				WorldToScreen (fX) (fY) (fZ) (0) (0) (0) (1) (stR1)												; Get ref screen coordinates
-				SetUIFloatAlt (stS1 + "\_X") fX																	; Set UI tile x coordinate
-				SetUIFloatAlt (stS1 + "\_Y") fY																	; Set UI tile y coordinate
-				SetUIFloatAlt (stS1 + "\_Radius") (Player.GetDistance3D stR1)									; Set player to ref distance
-				SetUIStringAlt (stS1 + "\_Timer") "%.2f" (GetMaxOf 0 (stR1.GetDetonationTimer))					; Set remaining fuse timer
-				
-				sv_Destruct stS1																				; Destroy string_var
+	; Check for any tracked refs
+	aGrenades = Goo1.AuxVarGetAsArr "*3DGrenade_Ref"
+	if eval aGrenades != Ar_Null
+
+		; Process refs and update any valid grenade icons
+		foreach aForE <- aGrenades
+			rGrenade = *aForE
+			if eval IsFormValid rGrenade && IsReference rGrenade && GetWeaponType (rGrenade.GetProjectileRefWeapon) == 10
+
+				; Update icon
+				sUIPath = "HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $aForE["key"]
+				WorldToScreen (fX) (fY) (fZ) (0) (0) (0) (1) (rGrenade)
+				SetUIFloatAlt (sUIPath + "\_X") fX
+				SetUIFloatAlt (sUIPath + "\_Y") fY
+				SetUIFloatAlt (sUIPath + "\_Radius") (Player.GetDistance3D rGrenade)
+				SetUIStringAlt (sUIPath + "\_Timer") "%.2f" (GetMaxOf 0 (rGrenade.GetDetonationTimer))
+
 			endif
 		loop
-		stA1 = aForE = Ar_Null																					; Invalidate array_var
+
+		sv_Destruct sUIPath
+		aGrenades = aForE = Ar_Null
+
 	endif
-	
 end

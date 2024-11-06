@@ -1,93 +1,111 @@
-int stI1
-ref stR1
-ref stR2
-ref stR3
-string_var stS1
-string_var stS2
-array_var stA1
-array_var stA2
-array_var stA3
-array_var aForE
-int iTilesTotal
-int iTilesFlag
+int iIndex
+int iTiles
+int iFlag
 int iB42Icon
 int iB42Color
+ref rProjectile
+ref rWeapon
+ref rExplosion
+array_var aGrenades
+array_var aProjectiles
+array_var aCache
+array_var aForE
+string_var sUIPath
+string_var sTexture
 
 begin Function {}
-	
-	iB42Icon = Goo1.AuxVarGetFlt "*3DGrenadeB42"																; Get B42 Quickthrow Icons support
-	iB42Color = Goo1.AuxVarGetFlt "*3DGrenadeColor"																; Get B42 Quickthrow color fix
-	iTilesTotal = Goo1.AuxVarGetFlt "*3DGrenadeTile"															; Get num UI tiles
-	
-	if eval iTilesTotal > 0																						; If any tracked refs
-		foreach aForE <- Goo1.AuxVarGetAsArr "*3DGrenadeRef"													; Loop through tracked refs
-			stR1 = *aForE
-			if eval (IsFormValid stR1 && IsReference stR1 && GetWeaponType (stR1.GetProjectileRefWeapon) == 10)	; If ref is a valid grenade projectile
-				iTilesFlag = 1																					; Set flag
-			elseif stR1 != Goo1																					; Elseif ref != Goo1
-				stI1 = aForE["key"]																				; Get array index 
-				Goo1.AuxVarSetRef "*3DGrenadeRef" Goo1 stI1														; Invalidate ref
-				SetUIFloatAlt ("HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $stI1 + "\visible") 0					; Hide UI tile
-			endif
-		loop
-		if iTilesFlag != 1																						; If all tracked refs invalidated
-			Goo1.AuxVarErase "*3DGrenadeRef"																	; Clear tracked refs
-			UnloadUIComponent "HUDMainMenu\3DGrenade\3DGRect"													; Remove parent tile	
-			iTilesTotal = 0																						; Reset tile count
-			SetJohnnyOnRenderUpdateEventHandler 0 (CompileScript "3DGrenadeIndicator/OnRender.gek")				; Remove On Render event
-		endif
-	endif
-	
-	stA2 = player.GetRefs 51 2 1 (Goo1.AuxVarGetFlt "*3DGrenadeDist")											; Get nearby projectile refs
-	stA3 = Goo1.AuxVarGetAsArr "*3DGrenadeRefCache" 															; Get ref cache
-	Goo1.AuxVarErase "*3DGrenadeRefCache"																		; Erase ref cache
-	Goo1.AuxVarSetFromArr "*3DGrenadeRefCache" stA2																; Init ref cache
 
-	if eval ((Ar_Size stA2) > 0 && stA2 != stA3)																; If any new projectile refs
-		stA1 = Goo1.AuxVarGetAsArr "*3DGrenadeRef"																; Get tracked refs
-		foreach aForE <- stA2																					; Loop through ref cache
-			stR1 = *aForE
-			if eval (IsFormValid stR1 && IsReference stR1)														; If valid ref
-				stR2 = stR1.GetProjectileRefWeapon																; Get projectile weap form
-				if eval (GetWeaponType stR2 == 10 && stR2 != TrapBaseball && (Ar_Find stR1 stA1) == Ar_BadNumericIndex); If grenade ref not currently tracked
-					if iTilesTotal < 1																			; If no current tracked refs
-						AddTileFromTemplate "HUDMainMenu\3DGrenade|3DGRect|3DGRect"								; Inject parent tile
-						SetJohnnyOnRenderUpdateEventHandler 1 (CompileScript "3DGrenadeIndicator/OnRender.gek")	; Add On Render event
+	; Get INI settings
+	iB42Icon = Goo1.AuxVarGetFlt "*3DGrenade_INI" 0
+	iB42Color = Goo1.AuxVarGetFlt "*3DGrenade_INI" 1
+
+	; Validate current grenade refs and remove any invalid icons
+	iTiles = Goo1.AuxVarGetFlt "*3DGrenade_Flt"
+	if eval iTiles > 0
+		foreach aForE <- Goo1.AuxVarGetAsArr "*3DGrenade_Ref"
+			rProjectile = *aForE
+
+			; Valid grenade ref
+			if eval (IsFormValid rProjectile && IsReference rProjectile && GetWeaponType (rProjectile.GetProjectileRefWeapon) == 10)
+				iFlag = 1
+
+			; Invalid ref
+			elseif rProjectile != Goo1
+				iIndex = aForE["key"]
+				Goo1.AuxVarSetRef "*3DGrenade_Ref" Goo1 iIndex
+				SetUIFloatAlt ("HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $iIndex + "\visible") 0
+			endif
+
+		loop
+
+		; Reset icons rect if no valid refs remain
+		if iFlag != 1
+			iTiles = 0
+			Goo1.AuxVarErase "*3DGrenade_Ref"
+			UnloadUIComponent "HUDMainMenu\3DGrenade\3DGRect"
+			SetJohnnyOnRenderUpdateEventHandler 0 (CompileScript "3DGrenadeIndicator/OnRender.gek")
+		endif
+
+	endif
+
+	; Cache nearby projectile refs
+	aProjectiles = player.GetRefs 51 2 1 (Goo1.AuxVarGetFlt "*3DGrenade_INI" 2)
+	aCache = Goo1.AuxVarGetAsArr "*3DGrenade_Cache"
+	Goo1.AuxVarErase "*3DGrenade_Cache"
+	Goo1.AuxVarSetFromArr "*3DGrenade_Cache" aProjectiles
+
+	; Process any new projectile refs and assign grenade icon
+	if eval ((Ar_Size aProjectiles) > 0 && aProjectiles != aCache)
+		aGrenades = Goo1.AuxVarGetAsArr "*3DGrenade_Ref"
+		foreach aForE <- aProjectiles
+			rProjectile = *aForE
+
+			; If new grenade ref found
+			if eval (IsFormValid rProjectile && IsReference rProjectile)
+				rWeapon = rProjectile.GetProjectileRefWeapon
+				if eval (GetWeaponType rWeapon == 10 && rWeapon != TrapBaseball && (Ar_Find rProjectile aGrenades) == Ar_BadNumericIndex)
+
+					; Add icon tile
+					if iTiles < 1
+						AddTileFromTemplate "HUDMainMenu\3DGrenade|3DGRect|3DGRect"
+						SetJohnnyOnRenderUpdateEventHandler 1 (CompileScript "3DGrenadeIndicator/OnRender.gek")
 					endif
-					Goo1.AuxVarSetRef "*3DGrenadeRef" stR1 iTilesTotal											; Track grenade ref
-					AddTileFromTemplate "HUDMainMenu\3DGrenade\3DGRect|3DGIcon|3DGInj%g" (iTilesTotal)			; Inject new tile
-					
-					stS1 = "HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $iTilesTotal								; Init UI tile string_var
-					
-					if eval stR1.GetDetonationTimer < 0 														; If grenade doesn't have fuse
-						SetUIFloat (stS1 + "\_ShowTimer") 0														; Hide timer text
+					Goo1.AuxVarSetRef "*3DGrenade_Ref" rProjectile iTiles
+					AddTileFromTemplate "HUDMainMenu\3DGrenade\3DGRect|3DGIcon|3DGInj%g" (iTiles)
+
+					; Set icon traits
+					sUIPath = "HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $iTiles
+					if eval rProjectile.GetDetonationTimer < 0
+						SetUIFloat (sUIPath + "\_ShowTimer") 0
 					endif
-					
-					stR3 = GetProjectileExplosion (stR1.gbo)													; Get projectile explosion
-					SetUIFloatAlt (stS1 + "\_RadiusDMG") (GetExplosionTraitNumeric stR3 2)						; Get explosion radius
-					if eval GetExplosionTraitNumeric stR3 4 > 0													; If radiation grenade
-						SetUIStringAlt (stS1 + "\Icon\filename") "Stentorious\Interface\3DGrenadeRad.dds"		; Set Rad icon
-					elseif iB42Icon == 1																		; If B42 Quickthrow icons support enabled
-						stS2 = "textures\interface\xlrQT\" + $RefToString stR2 + ".dds"							; Init texture path string_var
-						Sv_Replace ":|" stS2																	; Remove RefToString ":"
-						if FileExists (stS2)																	; If grenade icon found
-							Sv_Replace "textures\|" stS2														; Remove "textures\" prefix
-							SetUIStringAlt (stS1 + "\Icon\filename") (stS2)										; Set B42 Quickthrow icon
-							if iB42Color == 1																	; If B42 Quickthrow color fix enabled 
-								SetUIFloatAlt (stS1 + "\_IconColor") 0											; Remove systemcolor
+					rExplosion = GetProjectileExplosion (rProjectile.GBO)
+					SetUIFloatAlt (sUIPath + "\_RadiusDMG") (GetExplosionTraitNumeric rExplosion 2)
+
+					; Set icon texture
+					if eval GetExplosionTraitNumeric rExplosion 4 > 0
+						SetUIStringAlt (sUIPath + "\Icon\filename") "Stentorious\Interface\3DGrenadeRad.dds"
+					elseif iB42Icon == 1
+						sTexture = "textures\interface\xlrQT\" + $RefToString rWeapon + ".dds"
+						Sv_Replace ":|" sTexture
+						if FileExists (sTexture)
+							Sv_Replace "textures\|" sTexture
+							SetUIStringAlt (sUIPath + "\Icon\filename") (sTexture)
+							if iB42Color == 1
+								SetUIFloatAlt (sUIPath + "\_IconColor") 0
 							endif
 						endif
 					endif
-					iTilesTotal += 1																			; Update tile count
+
+					iTiles += 1
+
 				endif
 			endif
 		loop
 	endif
-	
-	Goo1.AuxVarSetFlt "*3DGrenadeTile" iTilesTotal																; Cache tile count
-	
-	sv_Destruct stS1 stS2																						; Destroy string_var
-	
-	stA1 = stA2 = stA3 = aForE = Ar_Null																		; Invalidate array_var
+
+	Goo1.AuxVarSetFlt "*3DGrenade_Flt" iTiles
+
+	sv_Destruct sUIPath sTexture
+	aGrenades = aProjectiles = aCache = aForE = Ar_Null
 
 end

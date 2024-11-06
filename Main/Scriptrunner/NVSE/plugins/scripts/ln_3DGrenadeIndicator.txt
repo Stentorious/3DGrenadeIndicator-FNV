@@ -1,41 +1,43 @@
-; 3D Grenade Indicator 1.6 - Stentorious
-if Goo1.AuxVarGetFlt "*3DGrenade_Init" != 1																										; On game restart
-	Goo1.AuxVarSetFlt "*3DGrenade_Init" 1
+; 3D Grenade Indicator 1.8 - Stentorious
+
+; On game restart
+if Goo1.AuxVarGetFlt "*3DGrenade_Init" 0 != 1
+	Goo1.AuxVarSetFlt "*3DGrenade_Init" 1 0
+
 	; Check for requirements
 	if GetNVSEVersion > 5 && GetNVSERevision > 2 && GetNVSEBeta > 2
 	else
 		MessageBoxEx "3D Grenade Indicator missing requirement!%rInstall xNVSE 6.3.3+."
 		return
-	endif 
+	endif
 	if GetPluginVersion "JohnnyGuitarNVSE" < 390
 		MessageBoxEx "3D Grenade Indicator missing requirement!%rInstall latest JohnnyGuitar NVSE plugin."
 		return
 	endif
-	SetGameMainLoopCallback (CompileScript "3DGrenadeIndicator/MainLoop.gek") 1 10 1															; Set Main Loop
-	Goo1.AuxVarSetFlt "*3DGrenadeDist" ((GetMaxOf 5 (GetMinOf 100 (GetINIFloat "General:fMaxDistance" "3DGrenadeIndicator.ini"))) * 69.99104)	; Get indicator visibility radius INI setting
-	SetUIFloatAlt "HUDMainMenu\3DGrenade\_RadiusMax" (Goo1.AuxVarGetFlt "*3DGrenadeDist")
-	SetUIFloatAlt "HUDMainMenu\3DGrenade\_ShowTimer" (GetINIFloat "General:bShowFuseTimer" "3DGrenadeIndicator.ini")								; Get fuse timer INI setting
-	if eval GetINIFloat "General:bPulsingIcon" "3DGrenadeIndicator.ini" == 1																	; Get Pulsing Opacity INI setting
-		SetUIFloatGradual "HUDMainMenu\3DGrenade\_AlphaPulse" 0 0.65 0.3 2																		; Get set damage radius pulsing alpha
-	endif		
-	if eval (FileExists "textures\interface\xlrQT\FalloutNV.esm4330.dds" && GetINIFloat "General:bB42Icons" "3DGrenadeIndicator.ini" == 1)		; Get B42 Quickthrow support INI setting
-		Goo1.AuxVarSetFlt "*3DGrenadeB42" 1
+	Goo1.AuxVarSetFlt "*3DGrenade_Init" 1 1
+
+	; Load INI settings
+	Goo1.AuxVarSetFlt "*3DGrenade_INI" (eval FileExists "textures\interface\xlrQT\FalloutNV.esm4330.dds" && GetINIFloat "General:bB42Icons" "3DGrenadeIndicator.ini" == 1) 0
+	Goo1.AuxVarSetFlt "*3DGrenade_INI" (GetINIFloat "General:bB42IconsColorFix" "3DGrenadeIndicator.ini") 1
+	Goo1.AuxVarSetFlt "*3DGrenade_INI" ((GetMaxOf 5 (GetMinOf 100 (GetINIFloat "General:fMaxDistance" "3DGrenadeIndicator.ini"))) * 69.99104) 2
+	SetUIFloatAlt "HUDMainMenu\3DGrenade\_RadiusMax" (Goo1.AuxVarGetFlt "*3DGrenade_INI" 2)
+	SetUIFloatAlt "HUDMainMenu\3DGrenade\_ShowTimer" (GetINIFloat "General:bShowFuseTimer" "3DGrenadeIndicator.ini")
+	if eval GetINIFloat "General:bPulsingIcon" "3DGrenadeIndicator.ini" == 1
+		SetUIFloatGradual "HUDMainMenu\3DGrenade\_AlphaPulse" 0 0.65 0.3 2
 	endif
-	if eval GetINIFloat "General:bB42IconsColorFix" "3DGrenadeIndicator.ini" == 1																; Get B42 Quickthrow color fix INI setting
-		Goo1.AuxVarSetFlt "*3DGrenadeColor" 1
-	endif
+
+	SetGameMainLoopCallback (CompileScript "3DGrenadeIndicator/MainLoop.gek") 1 10 1
+
 endif
 
-; Check for requirements
-if GetNVSEVersion > 5 && GetNVSERevision > 2 && GetNVSEBeta > 2
-else
-	return
-endif 
-if GetPluginVersion "JohnnyGuitarNVSE" < 390
-	return
+; On game load
+if Goo1.AuxVarGetFlt "*3DGrenade_Init" 1 == 1
+
+	; Reset all grenade icons
+	SetJohnnyOnRenderUpdateEventHandler 0 (CompileScript "3DGrenadeIndicator/OnRender.gek")
+	UnloadUIComponent "HUDMainMenu\3DGrenade\3DGRect"
+	Goo1.AuxVarErase "*3DGrenade_Ref"
+	Goo1.AuxVarErase "*3DGrenade_Cache"
+	Goo1.AuxVarErase "*3DGrenade_Flt"
+
 endif
-SetJohnnyOnRenderUpdateEventHandler 0 (CompileScript "3DGrenadeIndicator/OnRender.gek")															; Remove On Render event handler
-UnloadUIComponent "HUDMainMenu\3DGrenade\3DGRect"																								; Remove parent tile
-Goo1.AuxVarErase "*3DGrenadeRef"																												; Clear tracked refs
-Goo1.AuxVarErase "*3DGrenadeRefCache"																											; Clear cached refs
-Goo1.AuxVarErase "*3DGrenadeTile"																												; Clear tile count
