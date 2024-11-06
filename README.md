@@ -1,4 +1,7 @@
 # 3D Grenade Indicator
+<p align="center">
+    <img height="500px" src="https://staticdelivery.nexusmods.com/mods/130/images/86243/86243-1714064219-823540399.png">
+</p>
 
 ## Overview
 - Adds a UI element showing the position of grenades in 3D space.
