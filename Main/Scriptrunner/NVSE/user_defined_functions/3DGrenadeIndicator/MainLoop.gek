@@ -19,26 +19,26 @@ begin Function {}
 	iB42Icon = Goo1.AuxVarGetFlt "*3DGrenade_INI" 0
 	iB42Color = Goo1.AuxVarGetFlt "*3DGrenade_INI" 1
 
-	; Validate current grenade refs and remove any invalid icons
+	; Validate icons refs and hide invalid icons
 	iTiles = Goo1.AuxVarGetFlt "*3DGrenade_Flt"
 	if eval iTiles > 0
 		foreach aForE <- Goo1.AuxVarGetAsArr "*3DGrenade_Ref"
 			rProjectile = *aForE
 
-			; Valid grenade ref
-			if eval (IsFormValid rProjectile && IsReference rProjectile && GetWeaponType (rProjectile.GetProjectileRefWeapon) == 10)
+			; Grenade ref
+			if eval IsFormValid rProjectile && IsReference rProjectile && GetWeaponType (rProjectile.GetProjectileRefWeapon) == 10
 				iFlag = 1
 
 			; Invalid ref
-			elseif rProjectile != Goo1
+			elseif eval *aForE != -1
 				iIndex = aForE["key"]
-				Goo1.AuxVarSetRef "*3DGrenade_Ref" Goo1 iIndex
+				Goo1.AuxVarSetFlt "*3DGrenade_Ref" -1 iIndex
 				SetUIFloatAlt ("HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $iIndex + "\visible") 0
 			endif
 
 		loop
 
-		; Reset icons rect if no valid refs remain
+		; Reset icons rect if no valid refs
 		if iFlag != 1
 			iTiles = 0
 			Goo1.AuxVarErase "*3DGrenade_Ref"
@@ -49,21 +49,21 @@ begin Function {}
 	endif
 
 	; Cache nearby projectile refs
-	aProjectiles = player.GetRefs 51 2 1 (Goo1.AuxVarGetFlt "*3DGrenade_INI" 2)
+	aProjectiles = Player.GetRefs 51 2 1 (Goo1.AuxVarGetFlt "*3DGrenade_INI" 2)
 	aCache = Goo1.AuxVarGetAsArr "*3DGrenade_Cache"
 	Goo1.AuxVarErase "*3DGrenade_Cache"
 	Goo1.AuxVarSetFromArr "*3DGrenade_Cache" aProjectiles
 
 	; Process any new projectile refs and assign grenade icon
-	if eval ((Ar_Size aProjectiles) > 0 && aProjectiles != aCache)
+	if eval (Ar_Size aProjectiles) > 0 && aProjectiles != aCache
 		aGrenades = Goo1.AuxVarGetAsArr "*3DGrenade_Ref"
 		foreach aForE <- aProjectiles
 			rProjectile = *aForE
 
 			; If new grenade ref found
-			if eval (IsFormValid rProjectile && IsReference rProjectile)
+			if eval IsFormValid rProjectile && IsReference rProjectile
 				rWeapon = rProjectile.GetProjectileRefWeapon
-				if eval (GetWeaponType rWeapon == 10 && rWeapon != TrapBaseball && (Ar_Find rProjectile aGrenades) == Ar_BadNumericIndex)
+				if eval GetWeaponType rWeapon == 10 && rWeapon != TrapBaseball && (Ar_Find rProjectile aGrenades) == Ar_BadNumericIndex
 
 					; Add icon tile
 					if iTiles < 1
@@ -83,7 +83,7 @@ begin Function {}
 
 					; Set icon texture
 					if eval GetExplosionTraitNumeric rExplosion 4 > 0
-						SetUIStringAlt (sUIPath + "\Icon\filename") "Stentorious\Interface\3DGrenadeRad.dds"
+						SetUIStringAlt (sUIPath + "\Icon\filename") "Interface\Stentorious\3DGrenadeRad.dds"
 					elseif iB42Icon == 1
 						sTexture = "textures\interface\xlrQT\" + $RefToString rWeapon + ".dds"
 						Sv_Replace ":|" sTexture
