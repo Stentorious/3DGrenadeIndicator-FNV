@@ -14,6 +14,10 @@ if Goo1.AuxVarGetFlt "*3DGrenade_Init" 0 != 1
 		MessageBoxEx "3D Grenade Indicator missing requirement!%rInstall latest JohnnyGuitar NVSE plugin."
 		return
 	endif
+	if GetPluginVersion "UI Organizer Plugin" < 230
+		MessageBoxEx "3D Grenade Indicator missing requirement!%rInstall latest User Interface Organizer plugin."
+		return
+	endif
 	Goo1.AuxVarSetFlt "*3DGrenade_Init" 1 1
 
 	; Load INI settings
@@ -34,14 +38,11 @@ if Goo1.AuxVarGetFlt "*3DGrenade_Init" 0 != 1
 
 endif
 
-; On game load
+; Reset all icons on load
 if Goo1.AuxVarGetFlt "*3DGrenade_Init" 1 == 1
-
-	; Reset all grenade icons
 	SetJohnnyOnRenderUpdateEventHandler 0 (CompileScript "3DGrenadeIndicator/OnRender.gek")
 	UnloadUIComponent "HUDMainMenu\3DGrenade\3DGRect"
 	Goo1.AuxVarErase "*3DGrenade_Ref"
 	Goo1.AuxVarErase "*3DGrenade_Cache"
 	Goo1.AuxVarErase "*3DGrenade_Flt"
-
 endif
