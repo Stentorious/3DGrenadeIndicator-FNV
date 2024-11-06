@@ -22,8 +22,12 @@ if Goo1.AuxVarGetFlt "*3DGrenade_Init" 0 != 1
 	Goo1.AuxVarSetFlt "*3DGrenade_INI" ((GetMaxOf 5 (GetMinOf 100 (GetINIFloat "General:fMaxDistance" "3DGrenadeIndicator.ini"))) * 69.99104) 2
 	SetUIFloatAlt "HUDMainMenu\_3DG+Radius" (Goo1.AuxVarGetFlt "*3DGrenade_INI" 2)
 	SetUIFloatAlt "HUDMainMenu\_3DG+Timer" (GetINIFloat "General:bShowFuseTimer" "3DGrenadeIndicator.ini")
+	SetUIFloatAlt "HUDMainMenu\_3DG+Drop" (GetINIFloat "General:bDropShadow" "3DGrenadeIndicator.ini")
 	if eval GetINIFloat "General:bPulsingIcon" "3DGrenadeIndicator.ini" == 1
 		SetUIFloatGradual "HUDMainMenu\_3DG+Pulse" 0 0.65 0.3 2
+	endif
+	if eval GetINIFloat "General:iIconStyle" "3DGrenadeIndicator.ini" == 0
+		SetUIStringAlt "HUDMainMenu\_3DG+Icon" "interface\icons\typeicons\hot_keys_icon_throwweapons.dds"
 	endif
 
 	SetGameMainLoopCallback (CompileScript "3DGrenadeIndicator/MainLoop.gek") 1 10 1

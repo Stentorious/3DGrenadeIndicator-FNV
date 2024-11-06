@@ -83,7 +83,7 @@ begin Function {}
 
 					; Set icon texture
 					if eval GetExplosionTraitNumeric rExplosion 4 > 0
-						SetUIStringAlt (sUIPath + "\Icon\filename") "Interface\Stentorious\3DGrenadeRad.dds"
+						SetUIStringAlt (sUIPath + "\Icon\filename") "Interface\Stentorious\3DGrenade\Rad.dds"
 					elseif iB42Icon == 1
 						sTexture = "textures\interface\xlrQT\" + $RefToString rWeapon + ".dds"
 						Sv_Replace ":|" sTexture

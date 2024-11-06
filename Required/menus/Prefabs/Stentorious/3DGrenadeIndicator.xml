@@ -1,6 +1,8 @@
 <_3DG+Timer> 1 </_3DG+Timer>
 <_3DG+Radius> 0 </_3DG+Radius>
 <_3DG+Pulse> 0 </_3DG+Pulse>
+<_3DG+Drop> 0 </_3DG+Drop>
+<_3DG+Icon> Interface\Stentorious\3DGrenade\ySI.dds </_3DG+Icon>
 
 <rect name="3DGrenade">
 
@@ -88,6 +90,7 @@
 
 		<image name="Icon">
 			<alpha> <copy src="parent()" trait="alpha" /> </alpha>
+			<locus> &true; </locus>
 			<depth> -11 </depth>
 			<x>
 				<copy src="me()" trait="width" />
@@ -130,7 +133,30 @@
 					</sub>
 				</mul>
 			</brightness>
-			<filename> Interface\Stentorious\3DGrenade.dds </filename>
+			<filename> <copy src="io()" trait="_3DG+Icon" /> </filename>
+
+			<image name="DropShadow">
+				<visible>
+					<copy src="parent()" trait="visible" />
+					<and src="io()" trait="_3DG+Drop" />
+				</visible>
+				<alpha>
+					<copy src="parent()" trait="alpha" />
+					<div> 2 </div>
+				</alpha>
+				<depth> -1 </depth>
+				<x> 1 </x>
+				<y> 1 </y>
+				<height> <copy src="parent()" trait="height" /> </height>
+				<width> <copy src="parent()" trait="width" /> </width>
+				<zoom> &scale; </zoom>
+				<systemcolor> 0 </systemcolor>
+				<red> 0 </red>
+				<green> 0 </green>
+				<blue> 0 </blue>
+				<filename> <copy src="parent()" trait="filename" /> </filename>
+			</image>
+
 		</image>
 
 		<text name="Timer">
