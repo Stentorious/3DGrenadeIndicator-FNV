@@ -1,20 +1,49 @@
-<_3DG+Timer> 1 </_3DG+Timer>
-<_3DG+Radius> 0 </_3DG+Radius>
-<_3DG+Pulse> 0 </_3DG+Pulse>
-<_3DG+Drop> 0 </_3DG+Drop>
-<_3DG+Icon> Interface\Stentorious\3DGrenade\ySI.dds </_3DG+Icon>
-
 <rect name="3DGrenade">
+
+	<!-- ### Configuration Traits ### -->
+	<_IconScale> 1 </_IconScale>	<!-- Icon scale -->
+	<_Timer> 0 </_Timer>			<!-- Fuse timer -->
+	<_DistMax> 0 </_DistMax>		<!-- Maximum visibility distance -->
+	<_DistMode> 0 </_DistMode>		<!-- Max distance calculation mode -->
+	<_DropShadow> 1 </_DropShadow>	<!-- Icon drop shadow -->
+	<_Icon> Interface\Stentorious\3DGrenade\ySI.dds </_Icon>
+
+	<!-- ### Script Traits ### -->
+	<_visible> 1 </_visible>		<!-- General visibility flag -->
+	<_visible_pa> 1 </_visible_pa>	<!-- Power armor visibility flag -->
+	<_PlrAV6> 0 </_PlrAV6>			<!-- Player perception -->
+	<_AlphaPulse> 0 </_AlphaPulse>	<!-- Icon alpha pulse -->
 
 	<visible>
 		<copy src="ReticleCenter" trait="visible" />
 		<or src="AmmoTypeLabel" trait="visible" />
 		<or src="ActionPoints" trait="visible" />
 		<or src="HitPoints" trait="visible" />
+		<and src="me()" trait="_visible" />
+		<and src="me()" trait="_visible_pa" />
 	</visible>
 
+	<!-- Calculate distance to start icon fade in -->
+	<_Dist>
+		<copy> 0 </copy>
+		<add src="me()" trait="_DistMax" />
+		<onlyifnot src="me()" trait="_DistMode" />
+		<add>
+			<copy src="me()" trait="_DistMax" />
+			<div> 1680 </div>
+			<mul>
+				<log src="me()" trait="_PlrAV6" />
+				<div> <log> 4 </log> </div>
+				<mul> 1000 </mul>
+				<add> 1100 </add>
+				<div> 1.65 </div>
+			</mul>
+			<onlyif src="me()" trait="_DistMode" />
+		</add>
+	</_Dist>
+
 	<_Width>
-		<copy> 36 </copy>
+		<copy> 32 </copy>
 		<mul>
 			<copy src="io()" trait="_duiscale_65" />
 			<onlyif src="io()" trait="_DUIF3" />
@@ -23,6 +52,7 @@
 				<onlyifnot src="io()" trait="_DUIF3" />
 			</add>
 		</mul>
+		<mul src="me()" trait="_IconScale" />
 	</_Width>
 	<_Font>
 		<copy> 3 </copy>
@@ -33,11 +63,40 @@
 	</_Font>
 	<_FontY>
 		<copy> 0 </copy>
-		<add>
-			<copy> 7.6 </copy>
-			<onlyifnot src="io()" trait="_DUIF3" />
-		</add>
+		<add> 7.6 </add>
+		<onlyifnot src="io()" trait="_DUIF3" />
+		<mul src="me()" trait="_IconScale" />
 	</_FontY>
+	<_xMax>
+		<copy src="me()" trait="_Width" />
+		<div> 2 </div>
+		<add> 5 </add>
+	</_xMax>
+	<_xMin>
+		<copy src="screen()" trait="width" />
+		<sub src="me()" trait="_xMax" />
+	</_xMin>
+	<_yMax>
+		<copy> 5 </copy>
+		<add src="child(DummyText)" trait="height" />
+		<add src="me()" trait="_Width" />
+	</_yMax>
+	<_yMin>
+		<copy src="screen()" trait="height" />
+		<sub> 5 </sub>
+	</_yMin>
+
+	<text name="DummyText">
+		<visible> 0 </visible>
+		<alpha> 0 </alpha>
+		<zoom>
+			<copy> 80 </copy>
+			<mul src="parent()" trait="_IconScale" />
+		</zoom>
+		<font> <copy src="parent()" trait="_Font" /> </font>
+		<justify> &center; </justify>
+		<string> 9.9 </string>
+	</text>
 
 </rect>
 
@@ -49,47 +108,49 @@
 	<rect name="3DGTemp">
 
 		<visible>
-			<copy src="me()" trait="_Radius" />
-			<lte src="io()" trait="_3DG+Radius" />
+			<copy src="me()" trait="_Dist" />
+			<lte src="grandparent()" trait="_Dist" />
 		</visible>
-		<alpha>
-			<copy> 0 </copy>
-			<add>
-				<copy src="io()" trait="_3DG+Radius" />
-				<sub src="me()" trait="_Radius" />
-				<div>
-					<copy src="io()" trait="_3DG+Radius" />
-					<sub src="me()" trait="_RadiusDMG" />
-				</div>
-				<mul> 255 </mul>
-			</add>
-			<max> 0 </max>
-			<min> 255 </min>
-		</alpha>
 		<locus> &true; </locus>
 		<x>
 			<copy src="me()" trait="_x" />
-			<max> 0.02 </max>
-			<min> 0.98 </min>
 			<mul src="screen()" trait="width" />
+			<max src="grandparent()" trait="_xMax" />
+			<min src="grandparent()" trait="_xMin" />
 		</x>
 		<y>
 			<copy src="me()" trait="_y" />
-			<max> 0.05 </max>
-			<min> 1.00 </min>
 			<mul src="screen()" trait="height" />
-			<sub> 7.5 </sub>
+			<max src="grandparent()" trait="_yMax" />
+			<min src="grandparent()" trait="_yMin" />
 		</y>
 
-		<_x> -1 </_x>
-		<_y> -1 </_y>
-		<_Timer> 0 </_Timer>
-		<_Radius> 0 </_Radius>
-		<_RadiusDMG> 0 </_RadiusDMG>
-		<_IconColor> &hudmain; </_IconColor>
+		<!-- ### Script Traits ### -->
+		<_x> -1 </_x>							<!-- W2S X position -->
+		<_y> -1 </_y>							<!-- W2S Y position -->
+		<_Timer> 0 </_Timer>					<!-- Remaining detonation timer -->
+		<_Dist> 0 </_Dist>						<!-- Distance from player -->
+		<_DistDMG> 0 </_DistDMG>				<!-- Explosion damage radius -->
+		<_IconColor> 1 </_IconColor>			<!-- Icon systemcolor -->
+
+		<!-- Calculate icon alpha -->
+		<_alpha>
+			<copy> 255 </copy>
+			<sub>
+				<copy src="me()" trait="_Dist" />
+				<pow> 4 </pow>
+				<div>
+					<copy src="grandparent()" trait="_Dist"/>
+					<pow> 4 </pow>
+				</div>
+				<mul> 255 </mul>
+			</sub>
+			<max> 0 </max>
+			<min> 255 </min>
+		</_alpha>
 
 		<image name="Icon">
-			<alpha> <copy src="parent()" trait="alpha" /> </alpha>
+			<alpha> <copy src="parent()" trait="_alpha" /> </alpha>
 			<locus> &true; </locus>
 			<depth> -11 </depth>
 			<x>
@@ -108,15 +169,15 @@
 				<add>
 					<copy src="parent()" trait="_IconColor" />
 					<onlyifnot>
-						<copy src="parent()" trait="_Radius" />
-						<lte src="parent()" trait="_RadiusDMG" />
+						<copy src="parent()" trait="_Dist" />
+						<lte src="parent()" trait="_DistDMG" />
 					</onlyifnot>
 				</add>
 				<add>
-					<copy> &hudalt; </copy>
+					<copy> 2 </copy>
 					<onlyif>
-						<copy src="parent()" trait="_Radius" />
-						<lte src="parent()" trait="_RadiusDMG" />
+						<copy src="parent()" trait="_Dist" />
+						<lte src="parent()" trait="_DistDMG" />
 					</onlyif>
 				</add>
 			</systemcolor>
@@ -125,28 +186,25 @@
 				<mul>
 					<copy> 1 </copy>
 					<sub>
-						<copy src="io()" trait="_3DG+Pulse" />
+						<copy src="3DGrenade" trait="_AlphaPulse" />
 						<onlyif>
 							<copy src="me()" trait="systemcolor" />
-							<eq> &hudalt; </eq>
+							<eq> 2 </eq>
 						</onlyif>
 					</sub>
 				</mul>
 			</brightness>
-			<filename> <copy src="io()" trait="_3DG+Icon" /> </filename>
+			<filename> <copy src="3DGrenade" trait="_Icon" /> </filename>
 
 			<image name="DropShadow">
-				<visible>
-					<copy src="parent()" trait="visible" />
-					<and src="io()" trait="_3DG+Drop" />
-				</visible>
+				<visible> <copy src="3DGrenade" trait="_DropShadow" /> </visible>
 				<alpha>
 					<copy src="parent()" trait="alpha" />
 					<div> 2 </div>
 				</alpha>
 				<depth> -1 </depth>
-				<x> 1 </x>
-				<y> 1 </y>
+				<x> <copy src="3DGrenade" trait="_IconScale" /> </x>
+				<y> <copy src="me()" trait="x" /> </y>
 				<height> <copy src="parent()" trait="height" /> </height>
 				<width> <copy src="parent()" trait="width" /> </width>
 				<zoom> &scale; </zoom>
@@ -160,8 +218,8 @@
 		</image>
 
 		<text name="Timer">
-			<visible> <copy src="io()" trait="_3DG+Timer" /> </visible>
-			<alpha> <copy src="parent()" trait="alpha" /> </alpha>
+			<visible> <copy src="3DGrenade" trait="_Timer" /> </visible>
+			<alpha> <copy src="parent()" trait="_alpha" /> </alpha>
 			<depth> -10 </depth>
 			<x>
 				<copy> 0 </copy>
@@ -184,13 +242,17 @@
 				<sub src="me()" trait="height" />
 				<sub src="sibling(Icon)" trait="height" />
 			</y>
+			<zoom>
+				<copy> 80 </copy>
+				<mul src="3DGrenade" trait="_IconScale" />
+			</zoom>
 			<systemcolor>
-				<copy> &hudmain; </copy>
+				<copy> 1 </copy>
 				<add>
 					<copy> 1 </copy>
 					<onlyif>
-						<copy src="parent()" trait="_Radius" />
-						<lte src="parent()" trait="_RadiusDMG" />
+						<copy src="parent()" trait="_Dist" />
+						<lte src="parent()" trait="_DistDMG" />
 					</onlyif>
 				</add>
 			</systemcolor>
