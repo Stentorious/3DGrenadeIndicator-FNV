@@ -100,12 +100,12 @@
 
 </rect>
 
-<template name="3DGRect">
-	<rect name="3DGrenade"></rect>
+<template name="3DGrenade_Rect_Template">
+	<rect name="3DGrenade_Rect_Template"></rect>
 </template>
 
-<template name="3DGIcon">
-	<rect name="3DGTemp">
+<template name="3DGrenade_Icon_Template">
+	<rect name="3DGrenade_Icon_Template">
 
 		<visible>
 			<copy src="me()" trait="_Dist" />

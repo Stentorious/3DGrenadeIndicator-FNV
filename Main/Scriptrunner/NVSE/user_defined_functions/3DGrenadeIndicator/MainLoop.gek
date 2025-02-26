@@ -1,4 +1,4 @@
-int iIndex
+int iSize
 int iTiles
 int iFlag
 int iB42Icon
@@ -9,7 +9,6 @@ ref rExplosion
 array_var aGrenades
 array_var aProjectiles
 array_var aCache
-array_var aForE
 string_var sUIPath
 string_var sTexture
 
@@ -20,29 +19,20 @@ begin Function {}
 	iB42Color = Goo1.AuxVarGetFlt "*3DGrenade_INI" 1
 
 	; Validate icons refs and hide invalid icons
-	iTiles = Goo1.AuxVarGetFlt "*3DGrenade_Flt"
-	if eval iTiles > 0
-		foreach aForE <- Goo1.AuxVarGetAsArr "*3DGrenade_Ref"
-			rProjectile = *aForE
-
-			; Grenade ref
-			if eval IsFormValid rProjectile && IsReference rProjectile && GetWeaponType (rProjectile.GetProjectileRefWeapon) == 10
+	if eval (iSize = Goo1.AuxVarSize "*3DGrenade_Ref") > 0
+		while (iSize -= 1) > -1
+			if eval IsReference (rProjectile = Goo1.AuxVarGetRef "*3DGrenade_Ref" iSize) && GetWeaponType (rProjectile.GetProjectileRefWeapon) == 10
 				iFlag = 1
-
-			; Invalid ref
-			elseif eval *aForE != -1
-				iIndex = aForE["key"]
-				Goo1.AuxVarSetFlt "*3DGrenade_Ref" -1 iIndex
-				SetUIFloatAlt ("HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $iIndex + "\visible") 0
+			else
+				Goo1.AuxVarSetFlt "*3DGrenade_Ref" -1 iSize
+				SetUIFloatAlt ("HUDMainMenu\3DGrenade\Icons\Icon" + $iSize + "\visible") 0
 			endif
-
 		loop
 
 		; Reset icons rect if no valid refs
-		if iFlag != 1
-			iTiles = 0
+		if eval iFlag == 0
 			Goo1.AuxVarErase "*3DGrenade_Ref"
-			UnloadUIComponent "HUDMainMenu\3DGrenade\3DGRect"
+			UnloadUIComponent "HUDMainMenu\3DGrenade\Icons"
 			SetJohnnyOnRenderUpdateEventHandler 0 (CompileScript "3DGrenadeIndicator/OnRender.gek")
 		endif
 
@@ -55,42 +45,44 @@ begin Function {}
 	Goo1.AuxVarSetFromArr "*3DGrenade_Cache" aProjectiles
 
 	; Process any new projectile refs and assign grenade icon
-	if eval (Ar_Size aProjectiles) > 0 && aProjectiles != aCache
+	if eval (iSize = Ar_Size aProjectiles) > 0 && aProjectiles != aCache
+
 		aGrenades = Goo1.AuxVarGetAsArr "*3DGrenade_Ref"
-		foreach aForE <- aProjectiles
-			rProjectile = *aForE
+		iTiles = GetMaxOf 0 (GetUIFloatAlt "HUDMainMenu\3DGrenade\Icons\childcount")
+
+		while (iSize -= 1) > -1
 
 			; If new grenade ref found
-			if eval IsFormValid rProjectile && IsReference rProjectile
+			if eval IsReference (rProjectile = aProjectiles[iSize])
 				rWeapon = rProjectile.GetProjectileRefWeapon
 				if eval GetWeaponType rWeapon == 10 && rWeapon != TrapBaseball && (Ar_Find rProjectile aGrenades) == Ar_BadNumericIndex
 
 					; Add icon tile
 					if iTiles < 1
-						AddTileFromTemplate "HUDMainMenu\3DGrenade|3DGRect|3DGRect"
+						AddTileFromTemplate "HUDMainMenu\3DGrenade|3DGrenade_Rect_Template|Icons"
 						SetJohnnyOnRenderUpdateEventHandler 1 (CompileScript "3DGrenadeIndicator/OnRender.gek")
 					endif
 					Goo1.AuxVarSetRef "*3DGrenade_Ref" rProjectile iTiles
-					AddTileFromTemplate "HUDMainMenu\3DGrenade\3DGRect|3DGIcon|3DGInj%g" (iTiles)
+					AddTileFromTemplate "HUDMainMenu\3DGrenade\Icons|3DGrenade_Icon_Template|Icon%g" (iTiles)
 
 					; Set icon traits
-					sUIPath = "HUDMainMenu\3DGrenade\3DGRect\3DGInj" + $iTiles
+					sUIPath = "HUDMainMenu\3DGrenade\Icons\Icon" + $iTiles
 					if eval rProjectile.GetDetonationTimer < 0
-						SetUIFloat (sUIPath + "\_ShowTimer") 0
+						SetUIFloat (sUIPath + "\Timer\visible") 0
 					endif
 					rExplosion = GetProjectileExplosion (rProjectile.GBO)
-					SetUIFloatAlt (sUIPath + "\_RadiusDMG") (GetExplosionTraitNumeric rExplosion 2)
+					SetUIFloatAlt (sUIPath + "\_DistDMG") (GetExplosionTraitNumeric rExplosion 2)
 
 					; Set icon texture
 					if eval GetExplosionTraitNumeric rExplosion 4 > 0
 						SetUIStringAlt (sUIPath + "\Icon\filename") "Interface\Stentorious\3DGrenade\Rad.dds"
-					elseif iB42Icon == 1
+					elseif eval iB42Icon
 						sTexture = "textures\interface\xlrQT\" + $RefToString rWeapon + ".dds"
 						Sv_Replace ":|" sTexture
-						if FileExists (sTexture)
+						if eval FileExists (sTexture)
 							Sv_Replace "textures\|" sTexture
 							SetUIStringAlt (sUIPath + "\Icon\filename") (sTexture)
-							if iB42Color == 1
+							if iB42Color == 0
 								SetUIFloatAlt (sUIPath + "\_IconColor") 0
 							endif
 						endif
@@ -103,9 +95,7 @@ begin Function {}
 		loop
 	endif
 
-	Goo1.AuxVarSetFlt "*3DGrenade_Flt" iTiles
-
 	sv_Destruct sUIPath sTexture
-	aGrenades = aProjectiles = aCache = aForE = Ar_Null
+	aGrenades = aProjectiles = aCache = Ar_Null
 
 end
