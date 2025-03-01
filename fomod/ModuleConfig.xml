@@ -8,22 +8,13 @@
 			<optionalFileGroups order="Explicit">
 				<group name="Main Files" type="SelectExactlyOne">
 					<plugins order="Explicit">
-						<plugin name="Plugin">
-							<description>Select if you want 3D Grenade Indicator in plugin form. (ESP)</description>
-							<files>
-								<folder source="Main\Plugin" destination="" priority="0" />
-							</files>
-							<typeDescriptor>
-								<type name="Optional"/>
-							</typeDescriptor>
-						</plugin>
-						<plugin name="Scriptrunner">
-							<description>Select if you want 3D Grenade Indicator in scriptrunner form. (ESPless)</description>
+						<plugin name="Required">
+							<description>3D Grenade Indicator core files.</description>
 							<files>
 								<folder source="Main\Scriptrunner" destination="" priority="0" />
 							</files>
 							<typeDescriptor>
-								<type name="Optional"/>
+								<type name="Required"/>
 							</typeDescriptor>
 						</plugin>
 					</plugins>
