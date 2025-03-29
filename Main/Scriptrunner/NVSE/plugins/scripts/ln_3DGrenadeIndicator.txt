@@ -39,6 +39,9 @@ if Goo1.AuxVarGetFlt "*3DGrenade_Init" 0 != 1
 		SetUIStringAlt "HUDMainMenu\3DGrenade\_Icon" "interface\icons\typeicons\hot_keys_icon_throwweapons.dds"
 	endif
 
+	; Projectile refs to ignore
+	AssignKeyword TrapBaseball "3DGrenade_Ignore"
+
 	SetGameMainLoopCallback (CompileScript "3DGrenadeIndicator/MainLoop.gek") 1 10 1
 
 endif

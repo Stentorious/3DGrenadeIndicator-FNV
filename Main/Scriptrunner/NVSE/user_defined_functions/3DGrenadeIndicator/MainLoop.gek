@@ -3,6 +3,7 @@ int iTiles
 int iFlag
 int iB42Icon
 int iB42Color
+float fTimer
 ref rProjectile
 ref rWeapon
 ref rExplosion
@@ -55,7 +56,7 @@ begin Function {}
 			; If new grenade ref found
 			if eval IsReference (rProjectile = aProjectiles[iSize])
 				rWeapon = rProjectile.GetProjectileRefWeapon
-				if eval GetWeaponType rWeapon == 10 && rWeapon != TrapBaseball && (Ar_Find rProjectile aGrenades) == Ar_BadNumericIndex
+				if eval GetWeaponType rWeapon == 10 && !(HasKeyWord rWeapon "3DGrenade_Ignore") && (Ar_Find rProjectile aGrenades) == Ar_BadNumericIndex
 
 					; Add icon tile
 					if iTiles < 1
@@ -67,7 +68,8 @@ begin Function {}
 
 					; Set icon traits
 					sUIPath = "HUDMainMenu\3DGrenade\Icons\Icon" + $iTiles
-					if eval rProjectile.GetDetonationTimer < 0
+					fTimer = rProjectile.GetDetonationTimer
+					if eval fTimer < 0 || fTimer > 99999
 						SetUIFloat (sUIPath + "\Timer\visible") 0
 					endif
 					rExplosion = GetProjectileExplosion (rProjectile.GBO)
