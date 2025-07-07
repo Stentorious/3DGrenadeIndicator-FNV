@@ -1,0 +1,33 @@
+int iSize
+float fPosX
+float fPosY
+float fPosZ
+ref rGrenade
+string_var sUIPath
+
+begin Function {}
+
+	if eval (iSize = Goo1.AuxVarSize "*3DGrenade_Ref") < 1
+		return
+	endif
+
+	; Update grenade icons
+	while (iSize -= 1) > -1
+
+		if eval IsReference (rGrenade = Goo1.AuxVarGetRef "*3DGrenade_Ref" iSize) && GetWeaponType (rGrenade.GetProjectileRefWeapon) == 10
+		else
+			continue
+		endif
+
+		sUIPath = "HUDMainMenu\3DGrenade\Icons\Icon" + $iSize
+		WorldToScreen (fPosX) (fPosY) (fPosZ) (0) (0) (0) (1) (rGrenade)
+		SetUIFloatAlt (sUIPath + "\_x") fPosX
+		SetUIFloatAlt (sUIPath + "\_y") fPosY
+		SetUIFloatAlt (sUIPath + "\_Dist") (Player.GetDistance3D rGrenade)
+		SetUIStringAlt (sUIPath + "\_Timer") "%.1f" (rGrenade.GetDetonationTimer)
+
+	loop
+
+	sv_Destruct sUIPath
+
+end

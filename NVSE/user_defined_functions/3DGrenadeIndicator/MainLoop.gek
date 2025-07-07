@@ -1,0 +1,107 @@
+int iSize
+int iTiles
+int iFlag
+int iB42Icon
+int iB42Color
+float fTimer
+ref rProjectile
+ref rWeapon
+ref rExplosion
+array_var aGrenades
+array_var aProjectiles
+array_var aCache
+string_var sUIPath
+string_var sTexture
+
+begin Function {}
+
+	; Get INI settings
+	iB42Icon = Goo1.AuxVarGetFlt "*3DGrenade_INI" 0
+	iB42Color = Goo1.AuxVarGetFlt "*3DGrenade_INI" 1
+
+	; Validate icons refs and hide invalid icons
+	if eval (iSize = Goo1.AuxVarSize "*3DGrenade_Ref") > 0
+		while (iSize -= 1) > -1
+			if eval IsReference (rProjectile = Goo1.AuxVarGetRef "*3DGrenade_Ref" iSize) && GetWeaponType (rProjectile.GetProjectileRefWeapon) == 10
+				iFlag = 1
+			else
+				Goo1.AuxVarSetFlt "*3DGrenade_Ref" -1 iSize
+				SetUIFloatAlt ("HUDMainMenu\3DGrenade\Icons\Icon" + $iSize + "\visible") 0
+			endif
+		loop
+
+		; Reset icons rect if no valid refs
+		if eval iFlag == 0
+			Goo1.AuxVarErase "*3DGrenade_Ref"
+			UnloadUIComponent "HUDMainMenu\3DGrenade\Icons"
+			SetJohnnyOnRenderUpdateEventHandler 0 (CompileScript "3DGrenadeIndicator\OnRender.gek")
+		endif
+
+	endif
+
+	; Cache nearby projectile refs
+	aProjectiles = Player.GetRefs 51 2 1 (Goo1.AuxVarGetFlt "*3DGrenade_INI" 2)
+	aCache = Goo1.AuxVarGetAsArr "*3DGrenade_Cache"
+	Goo1.AuxVarErase "*3DGrenade_Cache"
+	Goo1.AuxVarSetFromArr "*3DGrenade_Cache" aProjectiles
+
+	; Process any new projectile refs and assign grenade icon
+	if eval (iSize = Ar_Size aProjectiles) > 0 && aProjectiles != aCache
+	else
+		aProjectiles = aCache = Ar_Null
+		return
+	endif
+
+	aGrenades = Goo1.AuxVarGetAsArr "*3DGrenade_Ref"
+	iTiles = GetMaxOf 0 (GetUIFloatAlt "HUDMainMenu\3DGrenade\Icons\childcount")
+
+	while (iSize -= 1) > -1
+
+		; If new grenade ref found
+		if eval IsReference (rProjectile = aProjectiles[iSize]) == 0
+			continue
+		endif
+
+		if eval GetWeaponType (rWeapon = rProjectile.GetProjectileRefWeapon) != 10 || HasKeyWord rWeapon "3DGrenadeBlacklist" || (Ar_Find rProjectile aGrenades) != Ar_BadNumericIndex
+			continue
+		endif
+
+		; Add icon tile
+		if eval iTiles < 1
+			AddTileFromTemplate "HUDMainMenu\3DGrenade|3DGrenade_Rect_Template|Icons"
+			SetJohnnyOnRenderUpdateEventHandler 1 (CompileScript "3DGrenadeIndicator\OnRender.gek")
+		endif
+		Goo1.AuxVarSetRef "*3DGrenade_Ref" rProjectile iTiles
+		AddTileFromTemplate "HUDMainMenu\3DGrenade\Icons|3DGrenade_Icon_Template|Icon%g" (iTiles)
+
+		; Set icon traits
+		sUIPath = "HUDMainMenu\3DGrenade\Icons\Icon" + $iTiles
+		if eval (fTimer = rProjectile.GetDetonationTimer) < 0 || fTimer > 99999
+			SetUIFloat (sUIPath + "\Timer\visible") 0
+		endif
+		rExplosion = GetProjectileExplosion (rProjectile.GBO)
+		SetUIFloatAlt (sUIPath + "\_DistDMG") (GetExplosionTraitNumeric rExplosion 2)
+
+		; Set icon texture
+		if eval GetExplosionTraitNumeric rExplosion 4 > 0
+			SetUIStringAlt (sUIPath + "\Icon\filename") "Interface\Stentorious\3DGrenade\Rad.dds"
+		elseif eval iB42Icon
+			sTexture = "textures\interface\xlrQT\" + $RefToString rWeapon + ".dds"
+			Sv_Replace ":|" sTexture
+			if eval FileExists (sTexture)
+				Sv_Replace "textures\|" sTexture
+				SetUIStringAlt (sUIPath + "\Icon\filename") (sTexture)
+				if iB42Color == 0
+					SetUIFloatAlt (sUIPath + "\_IconColor") 0
+				endif
+			endif
+		endif
+
+		iTiles += 1
+
+	loop
+
+	sv_Destruct sUIPath sTexture
+	aGrenades = aProjectiles = aCache = Ar_Null
+
+end
