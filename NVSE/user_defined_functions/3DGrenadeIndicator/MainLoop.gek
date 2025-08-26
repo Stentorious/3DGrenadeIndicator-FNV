@@ -76,21 +76,24 @@ begin Function {}
 
 		; Set icon traits
 		sUIPath = "HUDMainMenu\3DGrenade\Icons\Icon" + $iTiles
-		if eval (fTimer = rProjectile.GetDetonationTimer) < 0 || fTimer > 99999
-			SetUIFloat (sUIPath + "\Timer\visible") 0
+		if eval (fTimer = rProjectile.GetDetonationTimer) < 0 || fTimer > 99999 || (fTimer = GetProjectileTraitNumeric (rProjectile.GBO) 6) <= 0
+			SetUIFloatAlt (sUIPath + "\Timer\visible") 0
+			SetUIFloatAlt (sUIPath + "\IconClip\y") ((GetUIFloatAlt (sUIPath + "\IconClip\height")) * -1)
+		else
+			SetUIFloatAlt (sUIPath + "\_TimerMax") fTimer
 		endif
 		rExplosion = GetProjectileExplosion (rProjectile.GBO)
 		SetUIFloatAlt (sUIPath + "\_DistDMG") (GetExplosionTraitNumeric rExplosion 2)
 
 		; Set icon texture
 		if eval GetExplosionTraitNumeric rExplosion 4 > 0
-			SetUIStringAlt (sUIPath + "\Icon\filename") "Interface\Stentorious\3DGrenade\Rad.dds"
+			SetUIStringAlt (sUIPath + "\IconClip\Icon\filename") "Interface\Stentorious\3DGrenade\Rad.dds"
 		elseif eval iB42Icon
 			sTexture = "textures\interface\xlrQT\" + $RefToString rWeapon + ".dds"
 			Sv_Replace ":|" sTexture
 			if eval FileExists (sTexture)
 				Sv_Replace "textures\|" sTexture
-				SetUIStringAlt (sUIPath + "\Icon\filename") (sTexture)
+				SetUIStringAlt (sUIPath + "\IconClip\Icon\filename") (sTexture)
 				if iB42Color == 0
 					SetUIFloatAlt (sUIPath + "\_IconColor") 0
 				endif

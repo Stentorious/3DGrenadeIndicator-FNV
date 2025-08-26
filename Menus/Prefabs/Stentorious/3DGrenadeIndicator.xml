@@ -1,3 +1,6 @@
+<_screen_width> <copy src="screen()" trait="width" /> </_screen_width>
+<_screen_height> <copy src="screen()" trait="height" /> </_screen_height>
+
 <rect name="3DGrenade">
 
 	<!-- ### Configuration Traits ### -->
@@ -5,7 +8,6 @@
 	<_Timer> 0 </_Timer>			<!-- Fuse timer -->
 	<_DistMax> 0 </_DistMax>		<!-- Maximum visibility distance -->
 	<_DistMode> 0 </_DistMode>		<!-- Max distance calculation mode -->
-	<_DropShadow> 1 </_DropShadow>	<!-- Icon drop shadow -->
 	<_Icon> Interface\Stentorious\3DGrenade\ySI.dds </_Icon>
 
 	<!-- ### Script Traits ### -->
@@ -73,7 +75,7 @@
 		<add> 5 </add>
 	</_xMax>
 	<_xMin>
-		<copy src="screen()" trait="width" />
+		<copy src="io()" trait="_screen_width" />
 		<sub src="me()" trait="_xMax" />
 	</_xMin>
 	<_yMax>
@@ -82,7 +84,7 @@
 		<add src="me()" trait="_Width" />
 	</_yMax>
 	<_yMin>
-		<copy src="screen()" trait="height" />
+		<copy src="io()" trait="_screen_height" />
 		<sub> 5 </sub>
 	</_yMin>
 
@@ -114,13 +116,13 @@
 		<locus> &true; </locus>
 		<x>
 			<copy src="me()" trait="_x" />
-			<mul src="screen()" trait="width" />
+			<mul src="io()" trait="_screen_width" />
 			<max src="grandparent()" trait="_xMax" />
 			<min src="grandparent()" trait="_xMin" />
 		</x>
 		<y>
 			<copy src="me()" trait="_y" />
-			<mul src="screen()" trait="height" />
+			<mul src="io()" trait="_screen_height" />
 			<max src="grandparent()" trait="_yMax" />
 			<min src="grandparent()" trait="_yMin" />
 		</y>
@@ -128,10 +130,12 @@
 		<!-- ### Script Traits ### -->
 		<_x> -1 </_x>							<!-- W2S X position -->
 		<_y> -1 </_y>							<!-- W2S Y position -->
-		<_Timer> 0 </_Timer>					<!-- Remaining detonation timer -->
 		<_Dist> 0 </_Dist>						<!-- Distance from player -->
 		<_DistDMG> 0 </_DistDMG>				<!-- Explosion damage radius -->
 		<_IconColor> 1 </_IconColor>			<!-- Icon systemcolor -->
+		<_Timer> 1 </_Timer>					<!-- Remaining detonation timer -->
+		<_TimerNum> 1 </_TimerNum>				<!-- Remaining detonation timer -->
+		<_TimerMax> 1 </_TimerMax>				<!-- Total detonation timer -->
 
 		<!-- Calculate icon alpha -->
 		<_alpha>
@@ -149,10 +153,11 @@
 			<min> 255 </min>
 		</_alpha>
 
-		<image name="Icon">
-			<alpha> <copy src="parent()" trait="_alpha" /> </alpha>
-			<locus> &true; </locus>
-			<depth> -11 </depth>
+		<rect name="IconClip">
+			<clipwindow> 1 </clipwindow>
+			<depth> 0 </depth>
+			<width> <copy src="3DGrenade" trait="_Width" /> </width>
+			<height> <copy src="me()" trait="width" /> </height>
 			<x>
 				<copy src="me()" trait="width" />
 				<div> -2 </div>
@@ -160,65 +165,122 @@
 			<y>
 				<copy src="me()" trait="height" />
 				<div> -1 </div>
-			</y>
-			<width> <copy src="3DGrenade" trait="_Width" /> </width>
-			<height> <copy src="me()" trait="width" /> </height>
-			<zoom> &scale; </zoom>
-			<systemcolor>
-				<copy> 0 </copy>
 				<add>
-					<copy src="parent()" trait="_IconColor" />
-					<onlyifnot>
-						<copy src="parent()" trait="_Dist" />
-						<lte src="parent()" trait="_DistDMG" />
-					</onlyifnot>
-				</add>
-				<add>
-					<copy> 2 </copy>
+					<copy src="me()" trait="width" />
+					<mul>
+						<copy> 1 </copy>
+						<sub>
+							<copy src="parent()" trait="_TimerNum" />
+							<div src="parent()" trait="_TimerMax" />
+						</sub>
+					</mul>
 					<onlyif>
-						<copy src="parent()" trait="_Dist" />
-						<lte src="parent()" trait="_DistDMG" />
+						<copy src="3DGrenade" trait="_Timer" />
+						<gt> 1 </gt>
 					</onlyif>
 				</add>
-			</systemcolor>
-			<brightness>
-				<copy> 255 </copy>
-				<mul>
-					<copy> 1 </copy>
-					<sub>
-						<copy src="3DGrenade" trait="_AlphaPulse" />
+			</y>
+			<image name="Icon">
+				<clips> 1 </clips>
+				<alpha> <copy src="grandparent()" trait="_alpha" /> </alpha>
+				<locus> &true; </locus>
+				<depth> -11 </depth>
+				<x>
+					<copy src="me()" trait="width" />
+					<div> -2 </div>
+				</x>
+				<y>
+					<copy src="me()" trait="height" />
+					<div> -1 </div>
+				</y>
+				<width> <copy src="parent" trait="width" /> </width>
+				<height> <copy src="me()" trait="width" /> </height>
+				<zoom> &scale; </zoom>
+				<systemcolor>
+					<copy> 0 </copy>
+					<add>
+						<copy src="grandparent()" trait="_IconColor" />
+						<onlyifnot>
+							<copy src="grandparent()" trait="_Dist" />
+							<lte src="grandparent()" trait="_DistDMG" />
+						</onlyifnot>
+					</add>
+					<add>
+						<copy> 2 </copy>
 						<onlyif>
-							<copy src="me()" trait="systemcolor" />
-							<eq> 2 </eq>
+							<copy src="grandparent()" trait="_Dist" />
+							<lte src="grandparent()" trait="_DistDMG" />
 						</onlyif>
-					</sub>
-				</mul>
-			</brightness>
-			<filename> <copy src="3DGrenade" trait="_Icon" /> </filename>
-
+					</add>
+				</systemcolor>
+				<brightness>
+					<copy> 255 </copy>
+					<mul>
+						<copy> 1 </copy>
+						<sub>
+							<copy src="3DGrenade" trait="_AlphaPulse" />
+							<onlyif>
+								<copy src="me()" trait="systemcolor" />
+								<eq> 2 </eq>
+							</onlyif>
+						</sub>
+					</mul>
+				</brightness>
+				<filename> <copy src="3DGrenade" trait="_Icon" /> </filename>
+			</image>
+			<image name="IconBackground">
+				<visible>
+					<copy src="3DGrenade" trait="_Timer" />
+					<gt> 1 </gt>
+				</visible>
+				<alpha> <copy src="sibling(Icon)" trait="alpha" /> </alpha>
+				<locus> 1 </locus>
+				<depth> -12 </depth>
+				<x> <copy src="sibling(Icon)" trait="x" /> </x>
+				<y> <copy src="sibling(Icon)" trait="y" /> </y>
+				<height> <copy src="sibling(Icon)" trait="height" /> </height>
+				<width> <copy src="sibling(Icon)" trait="width" /> </width>
+				<zoom> &scale; </zoom>
+				<systemcolor> <copy src="sibling(Icon)" trait="systemcolor" /> </systemcolor>
+				<brightness> 76.5 </brightness>
+				<filename> <copy src="sibling(Icon)" trait="filename" /> </filename>
+			</image>
 			<image name="DropShadow">
-				<visible> <copy src="3DGrenade" trait="_DropShadow" /> </visible>
+				<visible> 1 </visible>
 				<alpha>
-					<copy src="parent()" trait="alpha" />
+					<copy src="sibling(Icon)" trait="alpha" />
 					<div> 2 </div>
 				</alpha>
-				<depth> -1 </depth>
-				<x> <copy src="3DGrenade" trait="_IconScale" /> </x>
-				<y> <copy src="me()" trait="x" /> </y>
-				<height> <copy src="parent()" trait="height" /> </height>
-				<width> <copy src="parent()" trait="width" /> </width>
+				<depth> -13 </depth>
+				<x>
+					<copy src="sibling(Icon)" trait="x" />
+					<add src="3DGrenade" trait="_IconScale" />
+				</x>
+				<y>
+					<copy src="sibling(Icon)" trait="y" />
+					<add src="3DGrenade" trait="_IconScale" />
+				</y>
+				<height> <copy src="sibling(Icon)" trait="height" /> </height>
+				<width> <copy src="sibling(Icon)" trait="width" /> </width>
 				<zoom> &scale; </zoom>
 				<systemcolor> 0 </systemcolor>
 				<red> 0 </red>
 				<green> 0 </green>
 				<blue> 0 </blue>
-				<filename> <copy src="parent()" trait="filename" /> </filename>
+				<brightness> 0 </brightness>
+				<filename> <copy src="sibling(Icon)" trait="filename" /> </filename>
 			</image>
-
-		</image>
+		</rect>
 
 		<text name="Timer">
-			<visible> <copy src="3DGrenade" trait="_Timer" /> </visible>
+			<visible>
+				<copy src="3DGrenade" trait="_Timer" />
+				<eq> 1 </eq>
+				<or>
+					<copy src="3DGrenade" trait="_Timer" />
+					<eq> 3 </eq>
+				</or>
+			</visible>
 			<alpha> <copy src="parent()" trait="_alpha" /> </alpha>
 			<depth> -10 </depth>
 			<x>
@@ -232,7 +294,7 @@
 				<sub>
 					<copy src="me()" trait="width" />
 					<div> 2 </div>
-					<sub src="screen()" trait="width" />
+					<sub src="io()" trait="_screen_width" />
 					<add src="parent()" trait="x" />
 					<max> 0 </max>
 				</sub>
@@ -240,7 +302,7 @@
 			<y>
 				<copy src="3DGrenade" trait="_FontY" />
 				<sub src="me()" trait="height" />
-				<sub src="sibling(Icon)" trait="height" />
+				<sub src="sibling(IconClip)" trait="height" />
 			</y>
 			<zoom>
 				<copy> 80 </copy>

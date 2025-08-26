@@ -8,7 +8,7 @@ Goo1.AuxVarErase "*3DGrenade_Ref"
 Goo1.AuxVarErase "*3DGrenade_Cache"
 ; Update perception calc
 if eval GetUIFloatAlt "HUDMainMenu\3DGrenade\_DistMode"
-	SetUIFloatAlt "HUDMainMenu\3DGrenade\_PlrAV6" (Clamp (Player.GetAV Perception) 1 10)
+	SetUIFloatAlt "HUDMainMenu\3DGrenade\_PlrAV6" (Player.GetThresholdAV Perception)
 endif
 
 ; On game restart
@@ -36,22 +36,21 @@ if GetPluginVersion "UI Organizer Plugin" < 230
 endif
 
 ; Load INI settings
-Goo1.AuxVarSetFlt "*3DGrenade_INI" (eval FileExists "textures\interface\xlrQT\FalloutNV.esm4330.dds" && GetINIFloat_Cached "B42 Quickthrow:bUseIcons" "Stentorious\3DGrenadeIndicator.ini") 0
-Goo1.AuxVarSetFlt "*3DGrenade_INI" (eval GetINIFloat_Cached "B42 Quickthrow:bInterfaceTint" "Stentorious\3DGrenadeIndicator.ini") 1
-Goo1.AuxVarSetFlt "*3DGrenade_INI" ((Clamp (GetINIFloat_Cached "General:fMaxDistance" "Stentorious\3DGrenadeIndicator.ini") 5 100) * 69.99104) 2
+Goo1.AuxVarSetFlt "*3DGrenade_INI" (eval FileExists "textures\interface\xlrQT\FalloutNV.esm4330.dds" && (GetINIFloat_Cached "B42 Quickthrow:bUseIcons" "Stentorious\3DGrenadeIndicator.ini" 1)) 0
+Goo1.AuxVarSetFlt "*3DGrenade_INI" (eval GetINIFloat_Cached "B42 Quickthrow:bInterfaceTint" "Stentorious\3DGrenadeIndicator.ini" 0) 1
+Goo1.AuxVarSetFlt "*3DGrenade_INI" ((Clamp (GetINIFloat_Cached "General:fMaxDistance" "Stentorious\3DGrenadeIndicator.ini" 25) 5 100) * 69.99104) 2
 SetUIFloatAlt "HUDMainMenu\3DGrenade\_DistMax" (Goo1.AuxVarGetFlt "*3DGrenade_INI" 2)
-SetUIFloatAlt "HUDMainMenu\3DGrenade\_Timer" (eval GetINIFloat_Cached "General:bFuseTimer" "Stentorious\3DGrenadeIndicator.ini")
-SetUIFloatAlt "HUDMainMenu\3DGrenade\_DropShadow" (eval GetINIFloat_Cached "General:bDropShadow" "Stentorious\3DGrenadeIndicator.ini")
-SetUIFloatAlt "HUDMainMenu\3DGrenade\_IconScale" (GetMaxOf 0 (GetINIFloat_Cached "General:fIconSize" "Stentorious\3DGrenadeIndicator.ini"))
-if eval GetINIFloat_Cached "General:bPerceptionCalc" "Stentorious\3DGrenadeIndicator.ini"
+SetUIFloatAlt "HUDMainMenu\3DGrenade\_Timer" (Clamp (GetINIFloat_Cached "General:iFuseTimer" "Stentorious\3DGrenadeIndicator.ini" 2) 0 3)
+SetUIFloatAlt "HUDMainMenu\3DGrenade\_IconScale" (GetMaxOf 0 (GetINIFloat_Cached "General:fIconSize" "Stentorious\3DGrenadeIndicator.ini" 1))
+if eval GetINIFloat_Cached "General:bPerceptionCalc" "Stentorious\3DGrenadeIndicator.ini" 0
 	SetUIFloatAlt "HUDMainMenu\3DGrenade\_DistMode" 1
-	SetUIFloatAlt "HUDMainMenu\3DGrenade\_PlrAV6" (Clamp (Player.GetAV Perception) 1 10)
-	SetOnActorValueChangeEventHandler 1 ({int iAVCode, float fOldValue, float fNewValue} => SetUIFloatAlt "HUDMainMenu\3DGrenade\_PlrAV6" (Clamp (Player.GetAV Perception) 1 10)) 0 6
+	SetUIFloatAlt "HUDMainMenu\3DGrenade\_PlrAV6" (Player.GetThresholdAV Perception)
+	SetOnActorValueChangeEventHandler 1 ({int iAVCode, float fOldValue, float fNewValue} => SetUIFloatAlt "HUDMainMenu\3DGrenade\_PlrAV6" (Player.GetThresholdAV Perception)) 0 6
 endif
-if eval GetINIFloat_Cached "General:bPulsingIcon" "Stentorious\3DGrenadeIndicator.ini"
+if eval GetINIFloat_Cached "General:bPulsingIcon" "Stentorious\3DGrenadeIndicator.ini" 1
 	SetUIFloatGradual "HUDMainMenu\3DGrenade\_AlphaPulse" 0 0.65 0.3 2
 endif
-if eval GetINIFloat_Cached "General:iIconStyle" "Stentorious\3DGrenadeIndicator.ini" == 0
+if eval (GetINIFloat_Cached "General:iIconStyle" "Stentorious\3DGrenadeIndicator.ini" 1) == 0
 	SetUIStringAlt "HUDMainMenu\3DGrenade\_Icon" "interface\icons\typeicons\hot_keys_icon_throwweapons.dds"
 endif
 

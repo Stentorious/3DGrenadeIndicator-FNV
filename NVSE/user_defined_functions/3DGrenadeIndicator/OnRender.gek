@@ -2,6 +2,7 @@ int iSize
 float fPosX
 float fPosY
 float fPosZ
+float fTimer
 ref rGrenade
 string_var sUIPath
 
@@ -24,7 +25,8 @@ begin Function {}
 		SetUIFloatAlt (sUIPath + "\_x") fPosX
 		SetUIFloatAlt (sUIPath + "\_y") fPosY
 		SetUIFloatAlt (sUIPath + "\_Dist") (Player.GetDistance3D rGrenade)
-		SetUIStringAlt (sUIPath + "\_Timer") "%.1f" (rGrenade.GetDetonationTimer)
+		SetUIFloatAlt (sUIPath + "\_TimerNum") (fTimer = GetMaxOf 0 (rGrenade.GetDetonationTimer))
+		SetUIStringAlt (sUIPath + "\_Timer") "%.1f" fTimer
 
 	loop
 
