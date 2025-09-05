@@ -16,8 +16,8 @@ string_var sTexture
 begin Function {}
 
 	; Get INI settings
-	iB42Icon = Goo1.AuxVarGetFlt "*3DGrenade_INI" 0
-	iB42Color = Goo1.AuxVarGetFlt "*3DGrenade_INI" 1
+	iB42Icon = Goo1.AuxVarGetFlt "*_3DGrenade_INI" 0
+	iB42Color = Goo1.AuxVarGetFlt "*_3DGrenade_INI" 1
 
 	; Validate icons refs and hide invalid icons
 	if eval (iSize = Goo1.AuxVarSize "*3DGrenade_Ref") > 0
@@ -40,7 +40,7 @@ begin Function {}
 	endif
 
 	; Cache nearby projectile refs
-	aProjectiles = Player.GetRefs 51 2 1 (Goo1.AuxVarGetFlt "*3DGrenade_INI" 2)
+	aProjectiles = Player.GetRefs 51 2 1 (GetUIFloatAlt "HUDMainMenu\3DGrenade\_DistMaxUnit")
 	aCache = Goo1.AuxVarGetAsArr "*3DGrenade_Cache"
 	Goo1.AuxVarErase "*3DGrenade_Cache"
 	Goo1.AuxVarSetFromArr "*3DGrenade_Cache" aProjectiles

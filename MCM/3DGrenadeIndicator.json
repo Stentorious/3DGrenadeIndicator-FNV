@@ -1,0 +1,96 @@
+{
+	"modName": "3DGrenadeIndicator",
+	"displayName": "$modDisplayName",
+	"description": "$modDescription",
+	"saveFile": "Stentorious/3DGrenadeIndicator.ini",
+	"minMCMVersion": 1.00,
+	"minModVersion": 1.00,
+	"requirements": [
+		{ "type": "file", "file": "NVSE/plugins/scripts/ln_3DGrenadeIndicator.txt" }
+	],
+	"submenus": {
+		"0": {
+			"listTitle": "$modDisplayName",
+			"pageTitle": "$modDisplayName",
+			"active": 1,
+			"columns": 1,
+			"enable": 1,
+			"options": {
+				"1": {
+					"title": "$General",
+					"enable": 1,
+					"type": 0
+				},
+				"2": {
+					"title": "$IconStyle",
+					"type": 1,
+					"enable": 1,
+					"mouse": "$IconStyleMouse",
+					"vars": [ { "uiTrait": "HUDMainMenu/3DGrenade/_Icon", "configINI": "General:iIconStyle", "default": 1 }],
+					"strings": [ "$Default", "$ySI" ]
+				},
+				"3": {
+					"title": "$IconScale",
+					"type": 2.5,
+					"enable": 1,
+					"mouse": "$IconScaleMouse",
+					"vars": [ { "uiTrait": "HUDMainMenu/3DGrenade/_IconScale", "configINI": "General:fIconScale", "default": 1 }],
+					"scale": { "valueDecimal": 2, "valueIncrement": 0.01, "valueMin": 0.5, "valueMax": 2 }
+				},
+				"4": {
+					"title": "$IconPulse",
+					"enable": 1,
+					"type": 5,
+					"mouse": "$IconPulseMouse",
+					"vars": [ { "uiTrait": "HUDMainMenu/3DGrenade/_AlphaPulseToggle", "configINI": "General:bPulsingIcon", "default": 1 }]
+				},
+				"5": {
+					"title": "$FuseTimer",
+					"enable": 1,
+					"type": 1,
+					"mouse": "$FuseTimerMouse",
+					"vars": [ { "uiTrait": "HUDMainMenu/3DGrenade/_Timer", "configINI": "General:iFuseTimer", "default": 2 }],
+					"strings": [ "$Disabled", "$NumericTimer", "$IconTimer", "$Both" ]
+				},
+				"6": {
+					"title": "$VisibilityDistance",
+					"type": 2,
+					"enable": 1,
+					"mouse": "$VisibilityDistanceMouse",
+					"suffix": "m",
+					"vars": [ { "uiTrait": "HUDMainMenu/3DGrenade/_DistMax", "configINI": "General:fMaxDistance", "default": 25 }],
+					"scale": { "valueDecimal": 0, "valueIncrement": 1, "valueMin": 5, "valueMax": 100, "suffix": "m" }
+				},
+				"7": {
+					"title": "$PlayerPerception",
+					"enable": 1,
+					"type": 5,
+					"mouse": "$PlayerPerceptionMouse",
+					"vars": [ { "uiTrait": "HUDMainMenu/3DGrenade/_DistMode", "configINI": "General:bPerceptionCalc", "default": 0 }]
+				},
+				"9": {
+					"title": "$B42Quickthrow",
+					"enable": 1,
+					"type": 0,
+					"state": { "form": "Goo1", "auxVar": "*_3DGrenade_INI", "key": 2, "value": 1 }
+				},
+				"10": {
+					"title": "$UseIcons",
+					"enable": 1,
+					"type": 5,
+					"mouse": "$UseIconsMouse",
+					"state": { "form": "Goo1", "auxVar": "*_3DGrenade_INI", "key": 2, "value": 1 },
+					"vars": [ { "form": "Goo1", "auxVar": "*_3DGrenade_INI", "key": 0, "configINI": "B42 Quickthrow:bUseIcons", "default": 1 }]
+				},
+				"11": {
+					"title": "$InterfaceTint",
+					"enable": 1,
+					"type": 5,
+					"mouse": "$InterfaceTintMouse",
+					"state": { "form": "Goo1", "auxVar": "*_3DGrenade_INI", "key": 2, "value": 1 },
+					"vars": [ { "form": "Goo1", "auxVar": "*_3DGrenade_INI", "key": 1, "configINI": "B42 Quickthrow:bInterfaceTint", "default": 0 }]
+				}
+			}
+		}
+	}
+}

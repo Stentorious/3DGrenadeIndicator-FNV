@@ -18,7 +18,7 @@
 - Configurable via the included 3DGrenadeIndicator.ini.
 
 ## Requirements
-- [xNVSE](https://www.nexusmods.com/newvegas/mods/67883) (6.3.3+)
+- [xNVSE](https://www.nexusmods.com/newvegas/mods/67883) (6.4.0+)
 - [JIP LN NVSE](https://www.nexusmods.com/newvegas/mods/58277)
 - [JohnnyGuitar NVSE](https://www.nexusmods.com/newvegas/mods/66927)
 - [User Interface Organizer](https://www.nexusmods.com/newvegas/mods/57174)
